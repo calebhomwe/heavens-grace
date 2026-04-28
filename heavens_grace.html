@@ -1,0 +1,2610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>HEAVEN'S GRACE — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c-deep:    #0a1428;
+    --c-night:   #142648;
+    --c-twilight:#1f3865;
+    --c-pale:    #cfe3ff;
+    --c-mist:    #a7c7ff;
+    --c-ice:     #7fa7f5;
+    --c-glass:   #eaf2ff;
+    --c-violet:  #ffe7b0;
+    --c-aurora:  #dcd6ff;
+    --c-perfect: #ffe9a8;
+    --c-great:   #c9a8ff;
+    --c-good:    #8ff0c8;
+    --c-bad:     #ffc28a;
+    --c-miss:    #ff8aa3;
+
+    --serif: 'Cinzel', 'Cormorant Garamond', serif;
+    --display: 'Cormorant Garamond', serif;
+    --ui: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--c-deep);
+    color: var(--c-pale);
+    font-family: var(--ui);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+
+  /* ============ ATMOSPHERIC BACKDROP ============ */
+  .atmosphere {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 110%, rgba(127,167,245,0.25), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 30% 20%, rgba(220,214,255,0.18), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 75% 30%, rgba(255,231,176,0.10), transparent 65%),
+      linear-gradient(180deg, #0a1428 0%, #142648 35%, #1f3865 70%, #2a4a85 100%);
+    z-index: 0;
+  }
+  .stars {
+    position: fixed; inset: 0; z-index: 1;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, white, transparent),
+      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(2px 2px at 80% 10%, rgba(220,214,255,0.9), transparent),
+      radial-gradient(1px 1px at 35% 85%, rgba(255,231,176,0.6), transparent),
+      radial-gradient(1px 1px at 90% 50%, white, transparent),
+      radial-gradient(1px 1px at 15% 65%, rgba(167,199,255,0.8), transparent);
+    animation: twinkle 8s ease-in-out infinite;
+    opacity: 0.6;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ============ SCREENS ============ */
+  .screen {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    z-index: 10;
+    padding: 24px;
+  }
+  .screen.active { display: flex; }
+
+  /* ===== START SCREEN ===== */
+  #start-screen .title {
+    font-family: var(--serif);
+    font-size: clamp(40px, 11vw, 88px);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #cfe3ff 50%, #a7c7ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 60px rgba(207,227,255,0.4);
+    animation: titleGlow 3s ease-in-out infinite;
+  }
+  @keyframes titleGlow {
+    0%,100% { filter: drop-shadow(0 0 20px rgba(207,227,255,0.3)); }
+    50%     { filter: drop-shadow(0 0 40px rgba(207,227,255,0.6)); }
+  }
+  #start-screen .subtitle {
+    font-family: var(--serif);
+    font-size: clamp(11px, 2.5vw, 14px);
+    letter-spacing: 0.5em;
+    margin-top: 12px;
+    color: rgba(207,227,255,0.7);
+    padding-left: 0.5em;
+  }
+  #start-screen .ornament {
+    margin: 28px 0;
+    font-family: var(--serif);
+    color: rgba(207,227,255,0.6);
+    letter-spacing: 0.4em;
+    font-size: 12px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  #start-screen .ornament::before, #start-screen .ornament::after {
+    content: '';
+    display: block;
+    width: 50px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(207,227,255,0.5), transparent);
+  }
+  .tap-prompt {
+    font-family: var(--serif);
+    font-size: 14px;
+    letter-spacing: 0.4em;
+    color: var(--c-pale);
+    padding: 16px 36px;
+    border: 1px solid rgba(207,227,255,0.3);
+    border-radius: 2px;
+    background: rgba(207,227,255,0.04);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    animation: tapPulse 2s ease-in-out infinite;
+    margin-top: 32px;
+  }
+  @keyframes tapPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(207,227,255,0.4), inset 0 0 20px rgba(207,227,255,0); }
+    50%     { box-shadow: 0 0 0 8px rgba(207,227,255,0), inset 0 0 30px rgba(207,227,255,0.1); }
+  }
+  .song-info {
+    margin-top: 36px;
+    text-align: center;
+    font-family: var(--display);
+    color: rgba(207,227,255,0.7);
+  }
+  .song-info .jp {
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    font-weight: 300;
+  }
+  .song-info .en {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    margin-top: 4px;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  /* ===== GAMEPLAY ===== */
+  #game-screen { padding: 0; }
+  #game-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+  }
+  .hud {
+    position: fixed;
+    top: env(safe-area-inset-top, 0);
+    left: 0; right: 0;
+    padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    z-index: 20;
+    pointer-events: none;
+    font-family: var(--ui);
+  }
+  .hud-block {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .hud-label {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    color: rgba(207,227,255,0.55);
+    font-family: var(--serif);
+  }
+  .hud-score {
+    font-family: var(--serif);
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: var(--c-glass);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 10px rgba(207,227,255,0.3);
+  }
+  .hud-rank {
+    width: 38px; height: 38px;
+    border: 1px solid rgba(207,227,255,0.4);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--c-glass);
+    background: rgba(20,38,72,0.4);
+    backdrop-filter: blur(8px);
+    margin-bottom: 6px;
+  }
+  .life-bar {
+    width: 110px;
+    height: 4px;
+    background: rgba(207,227,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .life-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--c-mist), var(--c-pale));
+    box-shadow: 0 0 8px rgba(207,227,255,0.6);
+    transition: width 0.3s ease;
+  }
+  .pause-btn {
+    pointer-events: auto;
+    width: 38px; height: 38px;
+    border: 1px solid rgba(207,227,255,0.35);
+    border-radius: 50%;
+    background: rgba(20,38,72,0.4);
+    backdrop-filter: blur(8px);
+    color: var(--c-pale);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .combo-display {
+    position: fixed;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 15;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .combo-display.active { opacity: 1; }
+  .combo-num {
+    font-family: var(--serif);
+    font-size: 64px;
+    color: var(--c-glass);
+    text-shadow: 0 0 20px rgba(207,227,255,0.6);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .combo-label {
+    font-family: var(--serif);
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    color: rgba(207,227,255,0.7);
+    margin-top: -4px;
+  }
+
+  .judgment-text {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 14;
+    pointer-events: none;
+    font-family: var(--serif);
+    font-size: 22px;
+    letter-spacing: 0.4em;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .judgment-text.show {
+    animation: judgPop 0.4s ease-out forwards;
+  }
+  @keyframes judgPop {
+    0%   { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    100% { opacity: 0; transform: translate(-50%, -55%) scale(1); }
+  }
+  .judgment-text.perfect { color: var(--c-perfect); text-shadow: 0 0 20px var(--c-perfect); }
+  .judgment-text.great   { color: var(--c-great);   text-shadow: 0 0 18px var(--c-great); }
+  .judgment-text.good    { color: var(--c-good);    text-shadow: 0 0 16px var(--c-good); }
+  .judgment-text.bad     { color: var(--c-bad);     text-shadow: 0 0 14px var(--c-bad); }
+  .judgment-text.miss    { color: var(--c-miss);    text-shadow: 0 0 14px var(--c-miss); }
+
+  /* ===== RESULT SCREEN ===== */
+  #result-screen .result-frame {
+    width: min(92vw, 460px);
+    background: linear-gradient(145deg, rgba(31,56,101,0.85), rgba(20,38,72,0.95));
+    border: 1px solid rgba(207,227,255,0.25);
+    backdrop-filter: blur(20px);
+    border-radius: 8px;
+    padding: 40px 32px;
+    box-shadow: 0 30px 80px rgba(10,20,40,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  #result-screen .result-frame::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(207,227,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  #result-screen .result-title {
+    font-family: var(--serif);
+    font-size: 14px;
+    letter-spacing: 0.6em;
+    text-align: center;
+    color: rgba(207,227,255,0.7);
+    padding-left: 0.6em;
+  }
+  #result-screen .result-title::before, #result-screen .result-title::after {
+    content: '◆';
+    font-size: 7px;
+    margin: 0 14px;
+    vertical-align: middle;
+    color: rgba(207,227,255,0.5);
+  }
+  #result-screen .song-name {
+    text-align: center;
+    margin: 24px 0 28px;
+  }
+  #result-screen .song-name .jp {
+    font-family: var(--display);
+    font-size: 26px;
+    color: var(--c-glass);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+  #result-screen .song-name .en {
+    font-family: var(--serif);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: rgba(207,227,255,0.5);
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  #result-screen .big-rank {
+    text-align: center;
+    margin: 16px 0 20px;
+  }
+  #result-screen .big-rank .letter {
+    font-family: var(--serif);
+    font-size: 120px;
+    font-weight: 700;
+    background: linear-gradient(180deg, #ffffff, #cfe3ff 40%, #a7c7ff 80%, #7fa7f5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+    filter: drop-shadow(0 0 30px rgba(207,227,255,0.5));
+    animation: rankReveal 0.8s ease-out;
+  }
+  @keyframes rankReveal {
+    0%   { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+    60%  { opacity: 1; transform: scale(1.1) rotate(2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  #result-screen .score-row {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  #result-screen .score-label {
+    font-family: var(--serif);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: rgba(207,227,255,0.6);
+  }
+  #result-screen .score-value {
+    font-family: var(--serif);
+    font-size: 38px;
+    color: var(--c-glass);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+    text-shadow: 0 0 15px rgba(207,227,255,0.4);
+  }
+  #result-screen .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 24px;
+    margin-bottom: 28px;
+    font-family: var(--serif);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+  }
+  #result-screen .stat-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(207,227,255,0.08);
+  }
+  #result-screen .stat-name { color: rgba(207,227,255,0.7); }
+  #result-screen .stat-name.perfect { color: var(--c-perfect); }
+  #result-screen .stat-name.great   { color: var(--c-great); }
+  #result-screen .stat-name.good    { color: var(--c-good); }
+  #result-screen .stat-name.bad     { color: var(--c-bad); }
+  #result-screen .stat-name.miss    { color: var(--c-miss); }
+  #result-screen .stat-value {
+    color: var(--c-glass);
+    font-variant-numeric: tabular-nums;
+  }
+  #result-screen .max-combo {
+    text-align: center;
+    font-family: var(--serif);
+    margin-bottom: 28px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(207,227,255,0.15);
+    border-bottom: 1px solid rgba(207,227,255,0.15);
+  }
+  #result-screen .max-combo .label {
+    font-size: 10px; letter-spacing: 0.4em;
+    color: rgba(207,227,255,0.6);
+  }
+  #result-screen .max-combo .value {
+    font-size: 28px;
+    color: var(--c-glass);
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  #result-screen .max-combo .full-combo {
+    font-size: 9px; letter-spacing: 0.5em;
+    color: var(--c-perfect);
+    margin-top: 6px;
+    text-shadow: 0 0 10px var(--c-perfect);
+  }
+  #result-screen .actions {
+    display: flex; gap: 12px; justify-content: center;
+  }
+  .btn {
+    font-family: var(--serif);
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    padding: 14px 28px;
+    border: 1px solid rgba(207,227,255,0.4);
+    background: rgba(207,227,255,0.04);
+    color: var(--c-pale);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .btn:hover, .btn:active {
+    background: rgba(207,227,255,0.12);
+    border-color: rgba(207,227,255,0.7);
+    transform: translateY(-1px);
+  }
+  .btn.primary {
+    background: linear-gradient(180deg, rgba(207,227,255,0.2), rgba(127,167,245,0.15));
+    border-color: rgba(207,227,255,0.6);
+  }
+
+  /* ===== PAUSE OVERLAY ===== */
+  #pause-screen .pause-frame {
+    background: rgba(20,38,72,0.92);
+    border: 1px solid rgba(207,227,255,0.3);
+    backdrop-filter: blur(20px);
+    padding: 32px 40px;
+    border-radius: 6px;
+    text-align: center;
+    min-width: 280px;
+  }
+  #pause-screen .pause-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    letter-spacing: 0.6em;
+    color: var(--c-glass);
+    margin-bottom: 24px;
+    padding-left: 0.6em;
+  }
+  .pause-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 16px 0;
+    font-family: var(--serif);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: rgba(207,227,255,0.8);
+  }
+  .pause-row input[type="range"] {
+    width: 130px;
+    accent-color: var(--c-mist);
+  }
+  .pause-actions {
+    display: flex; flex-direction: column; gap: 10px; margin-top: 24px;
+  }
+  .pause-actions .btn { width: 100%; }
+
+  /* ===== HIT FLASH ===== */
+  .hit-flash {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255,233,168,0.8) 0%, rgba(207,227,255,0.4) 40%, transparent 70%);
+    animation: hitFlash 0.5s ease-out forwards;
+  }
+  @keyframes hitFlash {
+    0% { transform: translate(-50%,-50%) scale(0.3); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+  }
+
+  .calibration-note {
+    position: fixed;
+    bottom: 16px; left: 0; right: 0;
+    text-align: center;
+    font-family: var(--serif);
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: rgba(207,227,255,0.4);
+    z-index: 100;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="atmosphere"></div>
+<div class="stars"></div>
+
+<!-- ============ START SCREEN ============ -->
+<div class="screen active" id="start-screen">
+  <div class="title">HEAVEN'S<br>GRACE</div>
+  <div class="subtitle">PROTOTYPE BUILD I</div>
+
+  <div class="ornament">PROLOGUE</div>
+
+  <div class="song-info">
+    <div class="jp">硝子の祈り針</div>
+    <div class="en">Glass Prayer Needle</div>
+  </div>
+
+  <div class="tap-prompt" id="tap-to-start">⟡ TAP TO START ⟡</div>
+
+  <div class="calibration-note">TAP THE BOTTOM OF EACH LANE WHEN A NOTE REACHES THE LINE</div>
+</div>
+
+<!-- ============ GAME SCREEN ============ -->
+<div class="screen" id="game-screen">
+  <canvas id="game-canvas"></canvas>
+
+  <div class="hud">
+    <div class="hud-block">
+      <div class="hud-rank" id="hud-rank">—</div>
+      <div class="hud-label">SCORE</div>
+      <div class="hud-score" id="hud-score">0000000</div>
+      <div class="life-bar"><div class="life-bar-fill" id="life-fill"></div></div>
+    </div>
+    <button class="pause-btn" id="pause-btn">‖</button>
+  </div>
+
+  <div class="combo-display" id="combo-display">
+    <div class="combo-num" id="combo-num">0</div>
+    <div class="combo-label">COMBO</div>
+  </div>
+
+  <div class="judgment-text" id="judgment-text"></div>
+</div>
+
+<!-- ============ PAUSE SCREEN ============ -->
+<div class="screen" id="pause-screen">
+  <div class="pause-frame">
+    <div class="pause-title">PAUSE</div>
+    <div class="pause-row">
+      <span>TIMING ADJUST</span>
+      <input type="range" id="timing-slider" min="-200" max="200" value="0" step="5">
+      <span id="timing-value" style="min-width: 50px; text-align: right;">0ms</span>
+    </div>
+    <div class="pause-row">
+      <span>NOTE SPEED</span>
+      <input type="range" id="speed-slider" min="3" max="12" value="7" step="0.5">
+      <span id="speed-value" style="min-width: 50px; text-align: right;">7.0</span>
+    </div>
+    <div class="pause-actions">
+      <button class="btn primary" id="resume-btn">RESUME</button>
+      <button class="btn" id="restart-btn">RESTART</button>
+      <button class="btn" id="exit-btn">EXIT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULT SCREEN ============ -->
+<div class="screen" id="result-screen">
+  <div class="result-frame">
+    <div class="result-title">RESULT</div>
+    <div class="song-name">
+      <div class="jp">硝子の祈り針</div>
+      <div class="en">Glass Prayer Needle · NISTAR</div>
+    </div>
+    <div class="big-rank"><div class="letter" id="result-rank">S</div></div>
+    <div class="score-row">
+      <div class="score-label">SCORE</div>
+      <div class="score-value" id="result-score">0000000</div>
+    </div>
+    <div class="stats">
+      <div class="stat-row"><span class="stat-name perfect">PERFECT</span><span class="stat-value" id="r-perfect">0</span></div>
+      <div class="stat-row"><span class="stat-name great">GREAT</span><span class="stat-value" id="r-great">0</span></div>
+      <div class="stat-row"><span class="stat-name good">GOOD</span><span class="stat-value" id="r-good">0</span></div>
+      <div class="stat-row"><span class="stat-name bad">BAD</span><span class="stat-value" id="r-bad">0</span></div>
+      <div class="stat-row"><span class="stat-name miss">MISS</span><span class="stat-value" id="r-miss">0</span></div>
+      <div class="stat-row"><span class="stat-name">ACCURACY</span><span class="stat-value" id="r-acc">0%</span></div>
+    </div>
+    <div class="max-combo">
+      <div class="label">MAX COMBO</div>
+      <div class="value" id="r-combo">0</div>
+      <div class="full-combo" id="r-fc" style="display:none;">FULL COMBO</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="result-retry">RETRY</button>
+      <button class="btn primary" id="result-next">CONTINUE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audio element will be created in JS to avoid base64 in src attribute parsing issues -->
+
+<script>
+/* ============================================================
+   HEAVEN'S GRACE — Rhythm Game Core
+   Project Sekai-style judgment-line input on 4 lanes
+   ============================================================ */
+
+// ----- CHART DATA (injected) -----
+const CHART = {
+  "song": "硝子の祈り針",
+  "song_romaji": "Garasu no Inori Hari",
+  "song_translation": "Glass Prayer Needle",
+  "duration": 135.76,
+  "notes": [
+    {
+      "time": 0.163,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 0.604,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 1.858,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 8.173,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 8.615,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 10.077,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 11.633,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 12.98,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 13.305,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 13.607,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 14.234,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 15.279,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 15.673,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 16.324,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 16.742,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 17.16,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 17.578,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 17.786,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 18.831,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 19.249,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 19.458,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 22.268,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 22.57,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 22.779,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 23.197,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 23.545,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 23.824,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 24.033,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 24.451,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 25.287,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 25.913,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 28.096,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 28.63,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 29.861,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 30.093,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 30.604,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 30.906,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 31.324,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 31.533,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 32.369,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 32.578,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 32.996,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 33.205,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 33.622,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 34.458,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 35.062,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 35.294,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 35.921,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 37.384,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 37.895,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 38.197,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 38.615,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 39.033,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 39.869,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 40.287,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 40.705,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 40.914,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 41.123,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 41.958,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 44.652,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 46.115,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 46.951,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 47.787,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 48.181,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 48.623,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 48.832,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 50.085,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 50.271,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 50.898,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 51.13,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 53.104,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 53.615,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 53.824,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 54.242,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 54.451,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 55.078,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 55.681,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 56.099,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 57.98,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 58.607,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 59.025,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 59.234,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 59.559,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 59.768,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 60.07,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 60.906,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 61.742,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 61.951,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 62.369,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 62.578,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 62.996,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 63.205,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 63.414,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 63.623,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 64.041,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 64.25,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 64.668,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 64.853,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 65.295,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 65.596,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 65.898,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 66.223,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 66.548,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 66.966,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 67.268,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 67.57,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 67.802,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 68.081,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 68.94,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 69.242,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 69.451,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 69.869,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 70.078,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 70.287,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 70.705,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 71.123,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 71.332,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 71.541,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 71.959,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 72.377,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 72.771,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 73.63,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 73.932,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 74.443,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 74.652,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 75.07,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 82.361,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 82.779,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 83.406,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 83.615,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 84.033,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 84.451,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 84.869,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 85.287,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 85.705,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 86.541,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 86.843,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 87.377,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 89.141,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 89.559,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 90.604,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 91.231,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 91.742,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 91.951,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 92.16,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 92.578,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 92.787,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 92.996,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 93.414,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 93.623,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 94.25,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 94.459,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 95.806,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 96.432,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 96.641,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 97.477,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 97.686,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 97.895,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 98.081,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 98.406,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 98.615,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 98.824,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 99.242,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 99.451,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 99.66,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 100.078,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 100.287,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 101.123,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 101.332,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 101.75,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 101.959,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 102.168,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 102.47,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 102.795,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 103.097,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 103.306,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 103.515,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 103.933,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 104.234,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 104.559,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 104.861,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 105.094,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 105.279,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 105.488,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 105.697,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 105.906,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 106.115,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 106.417,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 106.742,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 106.951,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 107.555,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 107.787,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 108.205,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 108.414,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 108.623,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 109.018,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 109.459,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 109.761,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 110.086,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 110.295,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 110.504,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 110.69,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 110.899,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 111.131,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 111.433,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 111.734,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 111.943,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 112.361,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 112.57,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 112.779,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 112.988,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 113.406,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 113.615,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 113.824,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 114.242,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 114.451,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 114.66,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 114.869,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 115.078,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 115.287,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 115.496,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 115.705,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 115.914,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 116.123,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 116.75,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 116.959,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 117.168,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 117.377,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 117.563,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 117.888,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 118.306,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 118.631,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 120.279,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 120.604,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 120.906,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 121.115,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 121.324,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 121.533,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 121.742,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 121.951,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 122.369,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 122.578,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 123.205,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 123.414,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 124.041,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 124.552,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 124.761,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 125.179,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 125.597,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 126.224,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 126.433,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 127.06,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 127.57,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 128.615,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 128.824,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 129.033,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 129.242,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 129.66,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 129.869,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 130.078,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 130.496,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 130.705,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 130.914,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 131.216,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 131.634,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 132.052,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 132.261,
+      "lane": 3,
+      "type": "tap"
+    },
+    {
+      "time": 132.679,
+      "lane": 1,
+      "type": "tap"
+    },
+    {
+      "time": 132.888,
+      "lane": 0,
+      "type": "tap"
+    },
+    {
+      "time": 133.306,
+      "lane": 2,
+      "type": "tap"
+    },
+    {
+      "time": 134.444,
+      "lane": 2,
+      "type": "tap"
+    }
+  ]
+};
+const AUDIO_FILE = 'glass_prayer.mp3'; // must be in same folder as this HTML
+
+// ----- AUDIO FALLBACK -----
+// If audio fails to load (file missing, codec issue, webview restriction),
+// the game can still run with a synthetic clock so the visuals/input can be tested.
+let audioOk = false;
+let syntheticStart = 0; // performance.now() of synthetic playback start
+
+// ----- CONSTANTS -----
+const LANES = 4;
+const JUDGMENT_LINE_Y_RATIO = 0.82; // 82% down the screen
+const NOTE_HEIGHT = 22;
+const HIT_ZONE_HEIGHT_RATIO = 0.20; // bottom 20% of each lane is tappable
+
+const WINDOWS = {
+  perfect: 0.040,  // ±40ms
+  great:   0.080,  // ±80ms
+  good:    0.120,  // ±120ms
+  bad:     0.160,  // ±160ms
+};
+const MISS_AFTER = 0.180; // notes past +180ms are miss
+
+const SCORE_VALUES = { perfect: 1000, great: 700, good: 400, bad: 100, miss: 0 };
+const LIFE_DELTAS = { perfect: 0.5, great: 0.3, good: 0, bad: -2, miss: -4 };
+
+// ----- STATE -----
+let canvas, ctx;
+let W = 0, H = 0, dpr = 1;
+let audio = null;
+let audioStartTime = 0; // performance.now() when audio actually started
+let chartNotes = [];    // active note pool
+let nextNoteIdx = 0;
+let totalNotes = 0;
+
+let state = 'menu'; // menu | playing | paused | result
+let pauseStartedAt = 0;
+let totalPauseTime = 0;
+
+let scoreData = {
+  score: 0,
+  combo: 0,
+  maxCombo: 0,
+  perfect: 0, great: 0, good: 0, bad: 0, miss: 0,
+  life: 100,
+};
+
+let settings = {
+  timingOffset: 0,  // ms — positive = notes appear later (audio is "ahead")
+  noteSpeed: 7.0,   // higher = notes fall faster
+};
+
+let hitFlashes = []; // visual hit effects
+
+// ----- BOOT -----
+window.addEventListener('load', () => {
+  canvas = document.getElementById('game-canvas');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // Decode chart
+  totalNotes = CHART.notes.length;
+
+  // Load audio from external file (sibling to this HTML)
+  audio = new Audio();
+  audio.src = AUDIO_FILE;
+  audio.preload = 'auto';
+  audio.addEventListener('canplaythrough', () => { audioOk = true; }, { once: true });
+  audio.addEventListener('error', () => {
+    console.warn('Audio file failed to load:', audio.error);
+    audioOk = false;
+  });
+  // kick off the load attempt
+  audio.load();
+
+  // Detect in-app webview (Files preview, messaging app preview, etc.)
+  // These often block audio. Show a notice telling the user to open in Safari.
+  detectWebview();
+
+  // Wire up UI
+  document.getElementById('tap-to-start').addEventListener('click', startGame);
+  document.getElementById('pause-btn').addEventListener('click', pauseGame);
+  document.getElementById('resume-btn').addEventListener('click', resumeGame);
+  document.getElementById('restart-btn').addEventListener('click', restartGame);
+  document.getElementById('exit-btn').addEventListener('click', exitToMenu);
+  document.getElementById('result-retry').addEventListener('click', restartGame);
+  document.getElementById('result-next').addEventListener('click', exitToMenu);
+
+  const timingSlider = document.getElementById('timing-slider');
+  const timingValue = document.getElementById('timing-value');
+  timingSlider.addEventListener('input', e => {
+    settings.timingOffset = parseInt(e.target.value);
+    timingValue.textContent = (settings.timingOffset >= 0 ? '+' : '') + settings.timingOffset + 'ms';
+  });
+
+  const speedSlider = document.getElementById('speed-slider');
+  const speedValue = document.getElementById('speed-value');
+  speedSlider.addEventListener('input', e => {
+    settings.noteSpeed = parseFloat(e.target.value);
+    speedValue.textContent = settings.noteSpeed.toFixed(1);
+  });
+
+  // Touch handling on the game screen
+  setupInput();
+
+  // Start render loop (always running, draws based on state)
+  requestAnimationFrame(loop);
+});
+
+function resizeCanvas() {
+  dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+// ----- SCREEN MANAGEMENT -----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ----- GAME FLOW -----
+function startGame() {
+  // Reset
+  scoreData = {
+    score: 0, combo: 0, maxCombo: 0,
+    perfect: 0, great: 0, good: 0, bad: 0, miss: 0,
+    life: 100,
+  };
+  chartNotes = CHART.notes.map(n => ({
+    time: n.time,
+    lane: n.lane,
+    type: n.type,
+    judged: false,
+    spawnY: 0,
+  }));
+  nextNoteIdx = 0;
+  totalPauseTime = 0;
+  hitFlashes = [];
+
+  // Try to play audio. If it works, we're in audio mode. If it fails, we run on
+  // a synthetic clock so the gameplay still works (just silent).
+  const launchPlay = () => {
+    state = 'playing';
+    showScreen('game-screen');
+    syntheticStart = performance.now();
+    audioStartTime = syntheticStart;
+  };
+
+  audio.currentTime = 0;
+  const playPromise = audio.play();
+  if (playPromise && playPromise.then) {
+    playPromise.then(() => {
+      audioOk = true;
+      launchPlay();
+    }).catch(err => {
+      console.warn('Audio play failed, falling back to silent mode:', err);
+      audioOk = false;
+      showAudioWarning();
+      launchPlay();
+    });
+  } else {
+    launchPlay();
+  }
+}
+
+function pauseGame() {
+  if (state !== 'playing') return;
+  state = 'paused';
+  if (audioOk) audio.pause();
+  pauseStartedAt = performance.now();
+  showScreen('pause-screen');
+}
+
+function resumeGame() {
+  if (state !== 'paused') return;
+  totalPauseTime += performance.now() - pauseStartedAt;
+  state = 'playing';
+  if (audioOk) audio.play().catch(()=>{});
+  showScreen('game-screen');
+}
+
+function restartGame() {
+  if (audioOk) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+  startGame();
+}
+
+function exitToMenu() {
+  if (audioOk) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+  state = 'menu';
+  showScreen('start-screen');
+}
+
+function endGame() {
+  state = 'result';
+  if (audioOk) audio.pause();
+
+  // Compute rank
+  const totalJudged = scoreData.perfect + scoreData.great + scoreData.good + scoreData.bad + scoreData.miss;
+  const accuracy = totalJudged > 0
+    ? (scoreData.perfect + scoreData.great * 0.7 + scoreData.good * 0.4 + scoreData.bad * 0.1) / totalJudged
+    : 0;
+
+  let rank = 'C';
+  if (accuracy >= 0.95) rank = 'S';
+  else if (accuracy >= 0.85) rank = 'A';
+  else if (accuracy >= 0.70) rank = 'B';
+
+  document.getElementById('result-rank').textContent = rank;
+  document.getElementById('result-score').textContent = String(scoreData.score).padStart(7, '0');
+  document.getElementById('r-perfect').textContent = scoreData.perfect;
+  document.getElementById('r-great').textContent = scoreData.great;
+  document.getElementById('r-good').textContent = scoreData.good;
+  document.getElementById('r-bad').textContent = scoreData.bad;
+  document.getElementById('r-miss').textContent = scoreData.miss;
+  document.getElementById('r-acc').textContent = (accuracy * 100).toFixed(2) + '%';
+  document.getElementById('r-combo').textContent = scoreData.maxCombo;
+  document.getElementById('r-fc').style.display = (scoreData.miss === 0 && scoreData.bad === 0) ? 'block' : 'none';
+
+  showScreen('result-screen');
+}
+
+// ----- TIMING -----
+function getSongTime() {
+  // Returns current song time in seconds, accounting for pauses + manual offset
+  if (state !== 'playing') return 0;
+  if (audioOk) {
+    return audio.currentTime - (settings.timingOffset / 1000);
+  }
+  // Synthetic clock fallback
+  const elapsed = (performance.now() - syntheticStart - totalPauseTime) / 1000;
+  return elapsed - (settings.timingOffset / 1000);
+}
+
+// ----- WEBVIEW DETECTION & WARNING -----
+function detectWebview() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  // Safari on iOS includes "Safari" in UA. In-app webviews (Files preview,
+  // messaging app previews, embedded webviews) typically lack "Safari" or
+  // include "CriOS"/"FxiOS" etc.
+  const isStandaloneSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  if (isIOS && !isStandaloneSafari && !window.navigator.standalone) {
+    const note = document.createElement('div');
+    note.style.cssText = `
+      position: fixed; top: env(safe-area-inset-top, 12px); left: 12px; right: 12px;
+      padding: 10px 14px; z-index: 1000;
+      background: rgba(255, 194, 138, 0.15);
+      border: 1px solid rgba(255, 194, 138, 0.5);
+      border-radius: 4px;
+      backdrop-filter: blur(10px);
+      font-family: var(--serif); font-size: 10px; letter-spacing: 0.2em;
+      color: #ffc28a; text-align: center;
+    `;
+    note.textContent = 'FOR AUDIO: OPEN IN SAFARI · TAP ⋯ → OPEN IN SAFARI';
+    document.body.appendChild(note);
+    setTimeout(() => { note.style.transition = 'opacity 1s'; note.style.opacity = '0.4'; }, 5000);
+  }
+}
+
+function showAudioWarning() {
+  const w = document.createElement('div');
+  w.style.cssText = `
+    position: fixed; bottom: 70px; left: 12px; right: 12px;
+    padding: 10px 14px; z-index: 1000;
+    background: rgba(255, 138, 163, 0.12);
+    border: 1px solid rgba(255, 138, 163, 0.4);
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    font-family: var(--serif); font-size: 10px; letter-spacing: 0.2em;
+    color: #ff8aa3; text-align: center;
+  `;
+  w.textContent = 'SILENT MODE · AUDIO BLOCKED · GAMEPLAY ONLY';
+  document.body.appendChild(w);
+  setTimeout(() => { w.remove(); }, 4500);
+}
+
+// ----- INPUT -----
+function setupInput() {
+  const handleTap = (clientX, clientY) => {
+    if (state !== 'playing') return;
+    const lane = Math.floor((clientX / W) * LANES);
+    if (lane < 0 || lane >= LANES) return;
+    const judgmentLineY = H * JUDGMENT_LINE_Y_RATIO;
+    const hitZoneTop = judgmentLineY - H * HIT_ZONE_HEIGHT_RATIO;
+    if (clientY < hitZoneTop) return; // tap above hit zone — ignore
+    judgTap(lane, clientX, clientY);
+  };
+
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      handleTap(t.clientX, t.clientY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('mousedown', e => {
+    e.preventDefault();
+    handleTap(e.clientX, e.clientY);
+  });
+}
+
+function judgTap(lane, x, y) {
+  const songTime = getSongTime();
+  
+  // Find earliest unjudged note in this lane within the bad window
+  let bestIdx = -1;
+  let bestDiff = Infinity;
+  for (let i = nextNoteIdx; i < chartNotes.length; i++) {
+    const n = chartNotes[i];
+    if (n.judged) continue;
+    if (n.lane !== lane) continue;
+    const diff = n.time - songTime; // positive if note is in future
+    if (Math.abs(diff) > WINDOWS.bad) {
+      if (diff > WINDOWS.bad) break; // future notes too far ahead — stop scanning
+      continue;
+    }
+    if (Math.abs(diff) < Math.abs(bestDiff)) {
+      bestDiff = diff;
+      bestIdx = i;
+    }
+  }
+  
+  if (bestIdx === -1) return; // tap with no nearby note — ignore
+  
+  const note = chartNotes[bestIdx];
+  const absDiff = Math.abs(bestDiff);
+  let judgment;
+  if (absDiff <= WINDOWS.perfect) judgment = 'perfect';
+  else if (absDiff <= WINDOWS.great) judgment = 'great';
+  else if (absDiff <= WINDOWS.good) judgment = 'good';
+  else judgment = 'bad';
+  
+  applyJudgment(judgment, note);
+  // Hit flash at judgment line position for that lane
+  const judgmentLineY = H * JUDGMENT_LINE_Y_RATIO;
+  const laneCx = (lane + 0.5) * (W / LANES);
+  hitFlashes.push({ x: laneCx, y: judgmentLineY, t: performance.now(), tier: judgment });
+}
+
+function applyJudgment(tier, note) {
+  note.judged = true;
+  scoreData[tier]++;
+  scoreData.score += SCORE_VALUES[tier];
+  scoreData.life = Math.max(0, Math.min(100, scoreData.life + LIFE_DELTAS[tier]));
+  
+  if (tier === 'miss' || tier === 'bad') {
+    scoreData.combo = 0;
+  } else {
+    scoreData.combo++;
+    if (scoreData.combo > scoreData.maxCombo) scoreData.maxCombo = scoreData.combo;
+  }
+  
+  // Show judgment text
+  const judgEl = document.getElementById('judgment-text');
+  judgEl.className = 'judgment-text show ' + tier;
+  judgEl.textContent = tier.toUpperCase();
+  // restart animation
+  void judgEl.offsetWidth;
+  judgEl.classList.add('show');
+}
+
+// ----- RENDER LOOP -----
+function loop(timestamp) {
+  requestAnimationFrame(loop);
+  
+  if (state === 'playing') {
+    update();
+    draw();
+    updateHUD();
+  }
+  // hit flashes draw even during paused (no, they pause too — only update t)
+}
+
+function update() {
+  const songTime = getSongTime();
+  
+  // Auto-miss: notes past the miss threshold
+  for (let i = nextNoteIdx; i < chartNotes.length; i++) {
+    const n = chartNotes[i];
+    if (n.judged) continue;
+    const diff = n.time - songTime;
+    if (diff < -MISS_AFTER) {
+      applyJudgment('miss', n);
+    } else if (diff > 0) {
+      break; // all subsequent notes are still in the future
+    }
+  }
+  
+  // Advance nextNoteIdx past judged notes
+  while (nextNoteIdx < chartNotes.length && chartNotes[nextNoteIdx].judged) {
+    nextNoteIdx++;
+  }
+  
+  // End condition
+  if (nextNoteIdx >= chartNotes.length) {
+    // wait a couple seconds for audio to finish, then end
+    setTimeout(() => {
+      if (state === 'playing') endGame();
+    }, 1500);
+    state = 'finishing';
+  }
+  
+  // Check audio ended
+  if (audioOk && audio.ended && state === 'playing') {
+    endGame();
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  
+  const judgmentLineY = H * JUDGMENT_LINE_Y_RATIO;
+  const laneW = W / LANES;
+  
+  // Lane backgrounds with perspective hint
+  for (let i = 0; i < LANES; i++) {
+    const x = i * laneW;
+    // Subtle vertical gradient per lane
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, 'rgba(127,167,245,0.02)');
+    g.addColorStop(0.6, 'rgba(127,167,245,0.06)');
+    g.addColorStop(1, 'rgba(207,227,255,0.10)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, 0, laneW, H);
+    
+    // Lane divider
+    if (i > 0) {
+      ctx.strokeStyle = 'rgba(207,227,255,0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
+  }
+  
+  // Outer rails with glow
+  ctx.strokeStyle = 'rgba(207,227,255,0.4)';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = 'rgba(207,227,255,0.6)';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  ctx.moveTo(1, 0);
+  ctx.lineTo(1, H);
+  ctx.moveTo(W-1, 0);
+  ctx.lineTo(W-1, H);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Judgment line
+  ctx.strokeStyle = 'rgba(207,227,255,0.85)';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = 'rgba(207,227,255,1)';
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.moveTo(0, judgmentLineY);
+  ctx.lineTo(W, judgmentLineY);
+  ctx.stroke();
+  
+  // Bright accent line
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.lineWidth = 1;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.moveTo(0, judgmentLineY);
+  ctx.lineTo(W, judgmentLineY);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Lane hit indicators (small circles at base of each lane)
+  for (let i = 0; i < LANES; i++) {
+    const cx = (i + 0.5) * laneW;
+    ctx.fillStyle = 'rgba(207,227,255,0.4)';
+    ctx.shadowColor = 'rgba(207,227,255,0.8)';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(cx, judgmentLineY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  
+  // Notes
+  const songTime = getSongTime();
+  // Note travel time (seconds from spawn to judgment line)
+  // Higher noteSpeed = shorter travel time (notes appear closer to line)
+  const travelTime = 8.5 / settings.noteSpeed; // 7.0 -> ~1.2s travel
+  
+  for (let i = nextNoteIdx; i < chartNotes.length; i++) {
+    const n = chartNotes[i];
+    if (n.judged) continue;
+    const dt = n.time - songTime; // seconds until hit
+    if (dt > travelTime) break; // not yet visible
+    if (dt < -0.3) continue;     // missed and offscreen
+    
+    // y position: at dt=travelTime y=0, at dt=0 y=judgmentLineY
+    const progress = 1 - (dt / travelTime); // 0 at top, 1 at line
+    const y = progress * judgmentLineY;
+    
+    const cx = (n.lane + 0.5) * laneW;
+    drawNote(cx, y, laneW * 0.78, dt);
+  }
+  
+  // Hit flashes
+  const now = performance.now();
+  hitFlashes = hitFlashes.filter(f => now - f.t < 500);
+  for (const f of hitFlashes) {
+    const age = (now - f.t) / 500;
+    const radius = 12 + age * 60;
+    const alpha = 1 - age;
+    ctx.save();
+    const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, radius);
+    if (f.tier === 'perfect') {
+      grad.addColorStop(0, `rgba(255,233,168,${alpha * 0.9})`);
+      grad.addColorStop(0.4, `rgba(255,233,168,${alpha * 0.4})`);
+    } else {
+      grad.addColorStop(0, `rgba(207,227,255,${alpha * 0.8})`);
+      grad.addColorStop(0.4, `rgba(207,227,255,${alpha * 0.3})`);
+    }
+    grad.addColorStop(1, 'rgba(207,227,255,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawNote(cx, y, w, dt) {
+  // Note style: thin rectangular bar with glow, brighter as it approaches the line
+  const proximity = Math.max(0, 1 - Math.min(1, dt / 1.0)); // 0 far, 1 close
+  const baseAlpha = 0.85 + 0.15 * proximity;
+  
+  ctx.save();
+  
+  // Glow
+  ctx.shadowColor = 'rgba(207,227,255,0.9)';
+  ctx.shadowBlur = 12 + 8 * proximity;
+  
+  // Note body — gradient bar
+  const x = cx - w/2;
+  const noteY = y - NOTE_HEIGHT/2;
+  const grad = ctx.createLinearGradient(x, noteY, x, noteY + NOTE_HEIGHT);
+  grad.addColorStop(0, `rgba(255,255,255,${baseAlpha})`);
+  grad.addColorStop(0.5, `rgba(207,227,255,${baseAlpha * 0.85})`);
+  grad.addColorStop(1, `rgba(127,167,245,${baseAlpha * 0.7})`);
+  ctx.fillStyle = grad;
+  
+  // Slightly rounded rectangle
+  const r = 3;
+  ctx.beginPath();
+  ctx.moveTo(x + r, noteY);
+  ctx.lineTo(x + w - r, noteY);
+  ctx.quadraticCurveTo(x + w, noteY, x + w, noteY + r);
+  ctx.lineTo(x + w, noteY + NOTE_HEIGHT - r);
+  ctx.quadraticCurveTo(x + w, noteY + NOTE_HEIGHT, x + w - r, noteY + NOTE_HEIGHT);
+  ctx.lineTo(x + r, noteY + NOTE_HEIGHT);
+  ctx.quadraticCurveTo(x, noteY + NOTE_HEIGHT, x, noteY + NOTE_HEIGHT - r);
+  ctx.lineTo(x, noteY + r);
+  ctx.quadraticCurveTo(x, noteY, x + r, noteY);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Top highlight
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = `rgba(255,255,255,${baseAlpha * 0.9})`;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + r, noteY);
+  ctx.lineTo(x + w - r, noteY);
+  ctx.stroke();
+  
+  ctx.restore();
+}
+
+function updateHUD() {
+  document.getElementById('hud-score').textContent = String(scoreData.score).padStart(7, '0');
+  document.getElementById('life-fill').style.width = scoreData.life + '%';
+  
+  // Combo
+  const combo = document.getElementById('combo-display');
+  if (scoreData.combo >= 5) {
+    combo.classList.add('active');
+    document.getElementById('combo-num').textContent = scoreData.combo;
+  } else {
+    combo.classList.remove('active');
+  }
+  
+  // Live rank estimate
+  const total = scoreData.perfect + scoreData.great + scoreData.good + scoreData.bad + scoreData.miss;
+  if (total > 5) {
+    const acc = (scoreData.perfect + scoreData.great * 0.7 + scoreData.good * 0.4 + scoreData.bad * 0.1) / total;
+    let r = 'C';
+    if (acc >= 0.95) r = 'S';
+    else if (acc >= 0.85) r = 'A';
+    else if (acc >= 0.70) r = 'B';
+    document.getElementById('hud-rank').textContent = r;
+  }
+}
+</script>
+
+</body>
+</html>
